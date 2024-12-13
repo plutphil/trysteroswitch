@@ -20,11 +20,15 @@
         Is Lamp 
     </label>
 </div>
+<div id="peerlist">
+
+</div>
     <script type="module">
         let peeriddiv = document.getElementById("peeriddiv");
         let uniqueiddiv = document.getElementById("uniqueiddiv");
         let switchcheck = document.getElementById("switchcheck");
         let statediv = document.getElementById("statediv");
+        let peerlist = document.getElementById("peerlist");
         
         switchcheck.disabled = true;
 
@@ -52,8 +56,8 @@
             localStorage.setItem('checkboxChecked', checkbox.checked);
             console.log(`Checkbox is now: ${checkbox.checked}`);
             console.log(room.getPeers())
-            room.getPeers().keys().forEach(element => {
-                console.log(element)
+            Object.keys(room.getPeers()).forEach(k => {
+                console.log(k)
             });
         });
         switchcheck.onchange=e=>{
@@ -71,8 +75,21 @@
         import { joinRoom,selfId } from './trystero-torrent.min.js'
         const config = { appId: 'san_narciso_3d' }
         const room = joinRoom(config, 'yoyodyne_')
+        window.trysteroroom = room;
+        let updatepeerlist = ()=>{
+            peerlist.innerHTML="";
+            const peers = room.getPeers();
+            Object.keys(peers).forEach(i => {
+                let d = document.createElement("div");
+                d.textContent = i+"   "+peerobjects[i].isswitch+peers[i].currentRemoteDescription.sdp.split("\r\n")[1];
+                peerlist.appendChild(d)
+            });
+        }
         room.onPeerJoin(peerId => {
             console.log(`${peerId} joined`)
+            peerobjects[peerId]={
+                isswitch:false
+            }
 
             setTimeout(k=>{
                 const pid = peerId;
@@ -86,8 +103,12 @@
                     },pid)
                 }
             },100)
+            updatepeerlist();
         });
-        room.onPeerLeave(peerId => console.log(`${peerId} left`))
+        room.onPeerLeave(peerId =>{
+            console.log(`${peerId} left`)
+            updatepeerlist();
+        })
         room.onPeerStream(
             (stream, peerId) => (peerElements[peerId].video.srcObject = stream)
         )
@@ -111,6 +132,7 @@
         let switchpeerid = "";
         let switchuniqueid = "";
         let switchstate = 0;
+        let peerobjects = {};
         getDrink((data, peerId) =>{
             console.log(data,peerId)
             if(data.type=="switch"){
@@ -119,6 +141,8 @@
                 switchpeerid = peerId;
                 switchstate = data.state;
                 switchuniqueid = data.id;
+                peerobjects[peerId].isswitch = true;
+                updatepeerlist();
             }
             if(data.type=="doswitch"){
                 switchstate = data.state;
@@ -126,10 +150,11 @@
                 sendMsg({
                         type:"confirm",
                         id:uniqueId,
-                        state:0
+                        state:data.state*1
                 },peerId)
             }
             if(data.type=="confirm"){
+                statediv.textContent = data.state*1;
                 switchcheck.disabled = false;
             }
         }
