@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="peeriddiv">_</div>
+    <div id="uniqueiddiv">_</div>
+    <div id="statediv">0</div>
+    <div>
+    switch<input type="checkbox" id="switchcheck">
+</div>
+<div>
+    <label>
+        <input type="checkbox" id="myCheckbox">
+        Is Lamp 
+    </label>
+</div>
+    <script type="module">
+        let peeriddiv = document.getElementById("peeriddiv");
+        let uniqueiddiv = document.getElementById("uniqueiddiv");
+        let switchcheck = document.getElementById("switchcheck");
+        let statediv = document.getElementById("statediv");
+        
+        switchcheck.disabled = true;
+
+        let uniqueId = localStorage.getItem('uniqueId');
+        if (!uniqueId) {
+            uniqueId = crypto.randomUUID(); // Generate a UUID
+            localStorage.setItem('uniqueId', uniqueId); // Store it in localStorage
+        }
+        console.log('Your unique ID:', uniqueId);
+        uniqueiddiv.textContent = uniqueId;
+
+        // Reference the checkbox
+        const checkbox = document.getElementById('myCheckbox');
+
+        // Load the saved state from localStorage
+        const savedState = localStorage.getItem('checkboxChecked');
+
+        // Set the checkbox state based on the saved value
+        if (savedState === 'true') {
+            checkbox.checked = true;
+        }
+
+        // Add an event listener to update localStorage whenever the checkbox state changes
+        checkbox.addEventListener('change', () => {
+            localStorage.setItem('checkboxChecked', checkbox.checked);
+            console.log(`Checkbox is now: ${checkbox.checked}`);
+            console.log(room.getPeers())
+            room.getPeers().keys().forEach(element => {
+                console.log(element)
+            });
+        });
+        switchcheck.onchange=e=>{
+            sendMsg({
+                type:"doswitch",
+                id:switchuniqueid,
+                state:switchcheck.checked
+            },switchpeerid);
+            switchcheck.disabled = true;
+            
+        };
+
+
+
+        import { joinRoom,selfId } from './trystero-torrent.min.js'
+        const config = { appId: 'san_narciso_3d' }
+        const room = joinRoom(config, 'yoyodyne_')
+        room.onPeerJoin(peerId => {
+            console.log(`${peerId} joined`)
+
+            setTimeout(k=>{
+                const pid = peerId;
+                console.log(pid)
+                console.log(typeof savedState)
+                if(savedState === 'true'){
+                    sendMsg({
+                        type:"switch",
+                        id:uniqueId,
+                        state:0
+                    },pid)
+                }
+            },100)
+        });
+        room.onPeerLeave(peerId => console.log(`${peerId} left`))
+        room.onPeerStream(
+            (stream, peerId) => (peerElements[peerId].video.srcObject = stream)
+        )
+        //room.leave()
+
+        console.log(`my peer ID is ${selfId}`)
+        peeriddiv.innerText = selfId;
+
+        
+
+        const [sendDrink, getDrink] = room.makeAction('drink')
+        function sendMsg(msg,friendId){
+            sendDrink(msg, friendId)
+        }
+        // buy drink for a friend
+
+        // buy round for the house (second argument omitted)
+        sendDrink({ drink: 'mezcal', withIce: false })
+
+        // listen for drinks sent to you
+        let switchpeerid = "";
+        let switchuniqueid = "";
+        let switchstate = 0;
+        getDrink((data, peerId) =>{
+            console.log(data,peerId)
+            if(data.type=="switch"){
+                switchcheck.disabled = false;
+                statediv.textContent = data.state;
+                switchpeerid = peerId;
+                switchstate = data.state;
+                switchuniqueid = data.id;
+            }
+            if(data.type=="doswitch"){
+                switchstate = data.state;
+                statediv.textContent = data.state*1;
+                sendMsg({
+                        type:"confirm",
+                        id:uniqueId,
+                        state:0
+                },peerId)
+            }
+            if(data.type=="confirm"){
+                switchcheck.disabled = false;
+            }
+        }
+        )
+    </script>
+</body>
+
+</html>
