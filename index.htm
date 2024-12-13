@@ -78,8 +78,7 @@
 
         import { joinRoom,selfId ,getRelaySockets} from './trystero-nostr.min.js'
         const config = { 
-            appId: 'san_narciso_3d',
-            relayUrls :["relay.snort.social","relay.piazza.today"]
+            appId: 'san_narciso_3d'//relayUrls :["relay.snort.social","relay.piazza.today"]
          }
         /*
         ,e=>{
@@ -89,7 +88,7 @@
             peerlist.appendChild(d)
         }
             */
-        const room = joinRoom(config, 'yoyodyne_')
+        const room = joinRoom(config, 'yoyodyne')
         window.trysteroroom = room;
         console.log(getRelaySockets())
         let updatepeerlist = ()=>{
