@@ -24,12 +24,16 @@
 <div id="peerlist">
 
 </div>
+<div id="log">
+
+</div>
     <script type="module">
         let peeriddiv = document.getElementById("peeriddiv");
         let uniqueiddiv = document.getElementById("uniqueiddiv");
         let switchcheck = document.getElementById("switchcheck");
         let statediv = document.getElementById("statediv");
         let peerlist = document.getElementById("peerlist");
+        let logdiv = document.getElementById("log");
         
         switchcheck.disabled = true;
 
@@ -68,12 +72,11 @@
                 state:switchcheck.checked
             },switchpeerid);
             switchcheck.disabled = true;
-            
         };
 
 
 
-        import { joinRoom,selfId } from './trystero-nostr.min.js'
+        import { joinRoom,selfId } from './trystero-mqtt.min.js'
         const config = { appId: 'san_narciso_3d' }
         const room = joinRoom(config, 'yoyodyne_')
         window.trysteroroom = room;
