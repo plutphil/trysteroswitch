@@ -76,10 +76,22 @@
 
 
 
-        import { joinRoom,selfId } from './trystero-ipfs.min.js'
-        const config = { appId: 'san_narciso_3d' }
+        import { joinRoom,selfId ,getRelaySockets} from './trystero-nostr.min.js'
+        const config = { 
+            appId: 'san_narciso_3d',
+            relayUrls :["relay.snort.social","relay.piazza.today"]
+         }
+        /*
+        ,e=>{
+            console.log(e);
+            let d = document.createElement("div");
+            d.textContent = " "+e;
+            peerlist.appendChild(d)
+        }
+            */
         const room = joinRoom(config, 'yoyodyne_')
         window.trysteroroom = room;
+        console.log(getRelaySockets())
         let updatepeerlist = ()=>{
             peerlist.innerHTML="";
             const peers = room.getPeers();
