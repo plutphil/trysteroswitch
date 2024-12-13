@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <div id="version">0.5</div>
+    <div id="version">0.6</div>
     <div id="peeriddiv">_</div>
     <div id="uniqueiddiv">_</div>
     <div id="statediv">0</div>
@@ -79,16 +79,17 @@
         import { joinRoom,selfId ,getRelaySockets} from './trystero-nostr.min.js'
         const config = { 
             appId: 'san_narciso_3d'//relayUrls :["relay.snort.social","relay.piazza.today"]
+            
          }
         /*
-        ,e=>{
+        
+            */
+        const room = joinRoom(config, 'yoyodyne',e=>{
             console.log(e);
             let d = document.createElement("div");
             d.textContent = " "+e;
-            peerlist.appendChild(d)
-        }
-            */
-        const room = joinRoom(config, 'yoyodyne')
+            logdiv.appendChild(d)
+        })
         window.trysteroroom = room;
         console.log(getRelaySockets())
         let updatepeerlist = ()=>{
@@ -96,7 +97,7 @@
             const peers = room.getPeers();
             Object.keys(peers).forEach(i => {
                 let d = document.createElement("div");
-                d.textContent = i+"   "+peerobjects[i].isswitch+peers[i].currentRemoteDescription.sdp.split("\r\n")[1];
+                d.textContent = i+"   "+peerobjects[i].isswitch+"    "+peers[i].currentRemoteDescription.sdp.split("\r\n")[1];
                 peerlist.appendChild(d)
             });
         }
